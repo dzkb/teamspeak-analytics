@@ -24,6 +24,8 @@ from teamspeak import *
 import pprint
 import sqlite3
 import time
+import json
+from couchbase.bucket import Bucket
 
 CURRENT_TIMESTAMP = int(time.time())
 
@@ -34,21 +36,33 @@ for line in cfg:
     records[record[0]] = record[1]
 
 teamspeak = TeamSpeak(records["host"], records["port"])
+parser = QueryParser()
 teamspeak.authenticate(records["username"], records["password"])
 teamspeak.select_server(records["serverid"])
 
-reply_data = teamspeak.query(b"clientlist")
+channels = parser.parse(teamspeak.query(b"channellist"))
+clients = parser.parse(teamspeak.query(b"clientlist"))
 
-raw_users = reply_data.split(b"|")
+output_data = {"channels" : channels, "clients" : clients}
+json.dump(output_data, open("channels.txt", "w+"))
 
-visited_channels = set()
+bucket = Bucket("couchbase://localhost/beer-sample")
 
-for data in raw_users:
-    userdata = data.split(b" ")
-    for client_data in userdata:
-        if b"cid=" in client_data:
-            channel_id = client_data.split(b"=")[1]
-            visited_channels.add(channel_id)
+# reply_data = parser.parse(teamspeak.query(b"clientlist"))
+# reply_data = parser.parse(teamspeak.query(b"channellist"))
 
-pprint.pprint(visited_channels, width=1)
+# pprint.pprint(reply_data)
+
+# raw_users = reply_data.split(b"|")
+
+# visited_channels = set()
+
+# for data in raw_users:
+#     userdata = data.split(b" ")
+#     for client_data in userdata:
+#         if b"cid=" in client_data:
+#             channel_id = client_data.split(b"=")[1]
+#             visited_channels.add(channel_id)
+
+# pprint.pprint(visited_channels, width=1)
 

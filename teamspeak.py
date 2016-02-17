@@ -55,3 +55,26 @@ class TeamSpeak:
         message = self.tn.read_until(b"\n") # read reply code
         assert(b"msg=ok" in message)
         return reply_data
+
+class QueryParser:
+    # generates list of dictionaries describing teamspeak objects
+    # from serverquery returned string
+
+    def parse(self, data):
+        output = []
+
+        raw_objects = data.split(b"|") # Pipe delimits objects
+
+        for raw_obj in raw_objects:
+            final_obj = {} # create dictionary describing object
+
+            object_data = raw_obj.split(b" ") # space delimits key=value
+
+            for keyval in object_data:
+                keyval_list = keyval.split(b"=") # equality sing separates key from value
+
+                final_obj[keyval_list[0].decode("utf-8")] = keyval_list[1].decode("utf-8")
+
+            output.append(final_obj)
+
+        return output
