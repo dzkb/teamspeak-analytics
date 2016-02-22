@@ -21,6 +21,8 @@ THE SOFTWARE.
 '''
 
 # TeamSpeak 3 serverquery module
+# reference:
+# http://media.teamspeak.com/ts3_literature/TeamSpeak%203%20Server%20Query%20Manual.pdf
 
 import telnetlib
 

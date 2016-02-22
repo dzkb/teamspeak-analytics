@@ -44,9 +44,11 @@ channels = parser.parse(teamspeak.query(b"channellist"))
 clients = parser.parse(teamspeak.query(b"clientlist"))
 
 output_data = {"channels" : channels, "clients" : clients}
-json.dump(output_data, open("channels.txt", "w+"))
 
-bucket = Bucket("couchbase://localhost/beer-sample")
+bucket = Bucket("couchbase://localhost/default")
+# print(json.dumps(output_data))
+
+bucket.insert(str(int(time.time())), output_data)
 
 # reply_data = parser.parse(teamspeak.query(b"clientlist"))
 # reply_data = parser.parse(teamspeak.query(b"channellist"))
